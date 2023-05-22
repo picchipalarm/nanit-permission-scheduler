@@ -1,4 +1,4 @@
 
 30 8 * * 1-5 /home/pi/run/firewalla-alarm-exceptions/script/nanit-permission.sh enable
 
-0 19 * * 1-5 /home/pi/run/firewalla-alarm-exceptions/script/nanit-permission.sh enable
+0 19 * * 1-5 /home/pi/run/firewalla-alarm-exceptions/script/nanit-permission.sh disable
