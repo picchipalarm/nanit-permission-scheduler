@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 set -u
-. .env
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+. "$SCRIPT_DIR/.env"
 
 if [ -z "$1" ]; then
   echo "No argument supplied"
