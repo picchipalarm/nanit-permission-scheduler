@@ -57,6 +57,9 @@ if [[ $statusCode != 200 ]]; then
   exit 1
 fi
 
+NEW_REFRESH_TOKEN=$(cat "$TEMP_JSON_RESPONSE" | grep -o '"refresh_token":"[^"]*' | grep -o '[^"]*$')
+sed -i '' "/^REFRESH_TOKEN/s/=.*$/=$NEW_REFRESH_TOKEN/" "$SCRIPT_DIR/.env"
+
 TOKEN=$(cat "$TEMP_JSON_RESPONSE" | grep -o '"token":"[^"]*' | grep -o '[^"]*$')
 
 statusCode=$(curl -s --write-out '%{http_code}' -o "$TEMP_JSON_RESPONSE" \
