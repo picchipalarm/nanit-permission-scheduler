@@ -2,7 +2,7 @@
 set -e
 set -u
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 . "$SCRIPT_DIR/.env"
 
 if [ -z "$1" ]; then
@@ -19,6 +19,30 @@ logd() {
 
 logd "Starting nanit permissions script"
 
+sendEmail() {
+  curl -s --output /dev/null \
+    --header "Authorization: Basic $SEND_CLICK_TOKEN" \
+    --request POST \
+    --header "Content-Type: application/json" \
+    --data-binary "{
+       \"to\":[
+          {
+             \"email\":\"$EMAIL\",
+             \"name\":\"$EMAIL\"
+          }
+       ],
+       \"from\":{
+          \"email_address_id\":$EMAIL_ID,
+          \"name\":\"nanit script error\"
+       },
+       \"subject\":\"nanit script error\",
+       \"body\":\"$1\"
+    }" \
+    'https://rest.clicksend.com/v3/email/send'
+    logd "email sent"
+}
+
+
 JSON='{ "refresh_token": "'$REFRESH_TOKEN'"}'
 
 statusCode=$(curl -s --write-out '%{http_code}' -o "$TEMP_JSON_RESPONSE" \
@@ -29,6 +53,7 @@ statusCode=$(curl -s --write-out '%{http_code}' -o "$TEMP_JSON_RESPONSE" \
 
 logd "Status code from refresh: $statusCode"
 if [[ $statusCode != 200 ]]; then
+  sendEmail "refresh failed code $statusCode"
   exit 1
 fi
 
@@ -45,6 +70,7 @@ statusCode=$(curl -s --write-out '%{http_code}' -o "$TEMP_JSON_RESPONSE" \
 
 logd "Status code from permissions: $statusCode"
 if [[ $statusCode != 200 ]]; then
+  sendEmail "permissions failed code $statusCode"
   exit 1
 fi
 
